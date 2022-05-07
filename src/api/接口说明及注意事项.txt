@@ -1,0 +1,91 @@
+let spring = process.env.VUE_APP_PREFIX_SPRING //spring服务的跨域检测字段
+let windchill = process.env.VUE_APP_PREFIX_WC //windchill服务的跨域检测字段
+
+接口说明:
+//使用argsToParams时 方法参数名字 要和后端接口方法的 接收参数名字 一样
+export function addFolderAccess(data) {
+    return request({
+        url: `/access/add`,//请求地址
+        serve: spring,//来自于.env文件的全局字段,访问不同服务
+        method: 'post',//请求类型
+
+        //argsToParams方法的第一个参数是当前方法的名字,第二个字段固定为arguments
+        params: argsToParams(addFolderAccess, arguments),
+        //设置data时不用argsToParams方法
+        data: data,
+        //目前上传文件时的设置,详细见参考
+        files:data
+
+        //访问spring服务时的当前用户数据
+        user: user,
+
+        //需要特殊设置ContentType时使用
+        ContentType: 'multipart/form-data',
+    })
+}
+
+注意事项:
+1.对于method属性,符合以下任意条件的设置为Post:
+    a.调用接口导致了数据变化
+    b.数据信息不出现在url上
+    c.传输信息较多或可能较多
+
+2.params设置:
+    后台以String类型接收,则使用argsToParams方法
+    后台以对象类型接收,则直接设置为传入的对象,传入对象和接收对象的字段保持一致
+不传输数据就不需要设置params或data
+
+
+3.files:上传文件时使用
+
+4.ContentType:需要特殊设置header的ContentType时使用
+
+5.user:权限有关时设置当前用户
+
+主要参考以下接口:
+
+//后端以String类型接收数据
+export function getSubFolder(folderId, containerId) {
+    return request({
+        url: `/folder/list`,
+        serve: windchill,
+        method: 'get',
+        user: user,
+        params: argsToParams(getSubFolder, arguments),
+    })
+    //get Query String Parameters
+}
+
+//后端以无修饰的对象类型接收数据
+export function addRole(data) {
+    return request({
+        url: `/role/add`,
+        serve: spring,
+        method: 'post',
+        params: data,
+    })
+    //post Query String Parameters
+}
+
+//后端以@RequestBody修饰的对象类型接收数据
+export function addFolderAccess(data) {
+    return request({
+        url: `/access/add`,
+        serve: spring,
+        method: 'post',
+        data: data,
+    })
+    //post payload
+}
+
+//上传文件,后端以@RequestParam("file")修饰的list接收数据
+export function uploadFiles(data) {
+    return request({
+        url: `/Download/uploadFiles`,
+        serve: windchill,
+        method: 'post',
+        ContentType: 'multipart/form-data',
+        files: data,
+    })
+    //post formdata
+}
