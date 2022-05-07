@@ -18,6 +18,8 @@ import java.util.Date;
 public class User {
     @TableId(type = IdType.AUTO)
     private Integer id;
+    private Integer admin;
     private String account;
     private String password;
+    private Integer sex;
 }
