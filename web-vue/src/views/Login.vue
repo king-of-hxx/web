@@ -12,7 +12,7 @@
       <footer>
         <keep-alive>
           <div class="input-group">
-            <el-input prefix-icon="el-icon-user" suffix-icon="el-icon-warning-outline" v-model="loginData.userNumber" placeholder="Enter your username"></el-input>
+            <el-input prefix-icon="el-icon-user" suffix-icon="el-icon-warning-outline" v-model="loginData.account" placeholder="Enter your username"></el-input>
             <el-input prefix-icon="el-icon-unlock" placeholder="input password" v-model="loginData.password" @keyup.enter.native="login" show-password></el-input>
           </div>
         </keep-alive>
@@ -45,7 +45,7 @@ export default {
     return {
       msg: '',
       loginData: {
-        userNumber: "",
+        account: "",
         password: ""
       }
     }
@@ -53,25 +53,27 @@ export default {
   created() {
     // this.loginData.password = cookie.get("password");
     // this.loginData.username = cookie.get("username");
-    if (cookie.get('token') && cookie.get('refreshToken')) {
-      this.$router.push(`/home`)
-    }
+    // if (cookie.get('token') && cookie.get('refreshToken')) {
+    //   this.$router.push(`/home`)
+    // }
   },
   methods: {
     async login() {
       console.log(this.loginData);
-      if (this.loginData.userNumber.trim() === "") {
+      if (this.loginData.account.trim() === "") {
         this.$message.warning("请输入用户名！");
       } else if (this.loginData.password.trim() === "") {
         this.$message.warning("请输入密码！");
       } else {
         //登录接口
-        // const res = await Login(this.loginData.userNumber, this.loginData.password)
-        // let token = res.data.token
-        // setToken(token)
-        this.$message.success("登陆成功");
+        const res = await Login(this.loginData)
+        console.log(res);
+        if (res.data.code == 200) {
+          this.$message.success("登陆成功");
+          this.$router.push(`/home`);
+        }
+
         // cookie.set("refreshToken", this.loginData.password);
-        this.$router.push(`/home`);
         // cookie.set("username", this.loginData.username);
         // cookie.set("password", this.loginData.password);
         // localStorage.setItem("username", this.loginData.username);

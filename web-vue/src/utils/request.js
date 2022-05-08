@@ -1,67 +1,46 @@
 import axios from "axios";
-import Vue from "vue";
 import { openLoading, closeLoading } from "./loading";
 
-const service = axios.create({
+const instance = axios.create({
   // baseURL: process.env.baseUrl,
   baseURL: "/api",
   timeout: 5000,
 });
 
 // request拦截器
-service.interceptors.request.use(
+instance.interceptors.request.use(
   (config) => {
     openLoading();
-    if (config.baseURL) {
-      config.headers["Content-Type"] = "application/json;";
-      config.headers["Access-Control-Allow-Origin"] = "*";
-      // config.headers["Authorization"] = "Bearer " + cookie.get("token");
-      // config.headers["RefreshToken"] = "Bearer " + cookie.get("refreshToken");
-    }
-    if (config.ContentType) config.headers["Content-Type"] = config.ContentType;
+    // if (getCookie() !== undefined) {
+    //   config.headers["cookie"] = encodeURIComponent(getCookie());
+    // }
     return config;
   },
-  (error) => {
+  (err) => {
     closeLoading();
-    Promise.reject(error).then(() => console.error(error));
+    return Promise.reject(err);
   }
 );
 
-// 响应拦截器
-service.interceptors.response.use(
-  (res) => {
+//http response拦截器
+instance.interceptors.response.use(
+  (response) => {
     closeLoading();
-    const { success, message, data } = res.data;
-    if (success) {
-      return data;
-    } else {
-      Vue.prototype.$message.error(message);
-      return Promise.reject(new Error(message));
-    }
-    // let msgType = undefined;
-    // if (res.config.baseURL) {
-    //   if (res.data.status != 200) msgType = "error";
-    //   else msgType = "success";
+    // const { code, message } = response.data;
+    // if (code === 200) {
+    return response;
+    // } else {
+    //   Message.error(message);
+    //   // return Promise.reject(new Error(message));
     // }
-    // if (msgType && res.data.message)
-    //   Vue.prototype.$message({
-    //     dangerouslyUseHTMLString: true,
-    //     message: res.data.message,
-    //     type: msgType,
-    //   });
   },
-  (error) => {
+  (err) => {
     closeLoading();
-    Vue.prototype.$message.error(error.message);
-    // Vue.prototype.$message({
-    //   message: error.message,
-    //   type: "error",
-    // });
-    return Promise.reject(error);
+    return Promise.reject(err);
   }
 );
 
-export default service;
+export default instance;
 
 // export function argsToParams(func, argument) {
 //   let param = {};

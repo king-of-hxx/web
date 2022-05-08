@@ -10,12 +10,12 @@
           <el-menu-item index="/home/personManage/userManage">
             <span slot="title">用户管理</span>
           </el-menu-item>
-          <el-menu-item index="/home/personManage/organizationManage">
+          <!-- <el-menu-item index="/home/personManage/organizationManage">
             <span slot="title">组织管理</span>
           </el-menu-item>
           <el-menu-item index="/home/personManage/roleManage">
             <span slot="title">角色管理</span>
-          </el-menu-item>
+          </el-menu-item> -->
         </el-menu>
       </el-col>
     </el-row>

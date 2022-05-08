@@ -6,62 +6,92 @@
     <section>
       <el-form :model="formInline" class="demo-form-inline">
         <el-form-item label="用户名">
-          <el-input v-model="formInline.user" placeholder="请输入用户名"></el-input>
+          <el-input v-model="formInline.keyWord" @keyup.enter.native="onSubmit" placeholder="请输入用户名"></el-input>
         </el-form-item>
-        <el-form-item label="创建时间">
-          <el-date-picker v-model="formInline.createValue" type="datetimerange" start-placeholder="开始日期" end-placeholder="结束日期">
-          </el-date-picker>
+        <!-- <el-form-item label="员工姓名">
+          <el-input v-model="formInline.username" @keyup.enter.native="onSubmit" placeholder="请输入员工姓名"></el-input>
         </el-form-item>
-        <el-form-item label="修改时间">
-          <el-date-picker v-model="formInline.changeValue" type="datetimerange" start-placeholder="开始日期" end-placeholder="结束日期">
-          </el-date-picker>
-        </el-form-item>
+        <el-form-item label="组织" :label-width="formLabelWidth">
+          <el-select v-model="formInline.department" @change="onSubmit" placeholder="请选择组织名称">
+            <el-option v-for="item in organization" :key="item.departmentId" :label="item.name" :value="item.name"></el-option>
+          </el-select>
+        </el-form-item> -->
         <el-form-item class="button_group">
           <el-button type="primary" icon="el-icon-search" @click="onSubmit">查询</el-button>
-          <el-button icon="el-icon-search" @click="onSubmit">重置</el-button>
+          <el-button icon="el-icon-refresh" @click="reset">重置</el-button>
         </el-form-item>
       </el-form>
     </section>
     <footer>
-      <UserManageFooter />
+      <UserManageFooter :tableData="tableData" />
       <el-row type="flex" justify="end">
-        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage4" :page-sizes="[10, 20, 30, 40]" :page-size="10" layout="total, sizes, prev, pager, next, jumper" :total="40">
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="[5, 10, 15, 20]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
         </el-pagination>
       </el-row>
     </footer>
   </div>
 </template>
 <script>
-import CommonHeader from "./CommonHeader"
-import UserManageFooter from "./UserManageFooter"
+import { getAllUserList } from "@/api/userManage"
+import CommonHeader from "./CommonHeader";
+import UserManageFooter from "./UserManageFooter";
 export default {
   components: {
     UserManageFooter,
-    CommonHeader
+    CommonHeader,
   },
   data() {
     return {
       formInline: {
-        user: '',
-        createValue: [new Date(2000, 10, 10, 10, 10), new Date(2000, 10, 11, 10, 10)],
-        changeValue: ''
+        keyWord: "",
       },
+      formLabelWidth: "120px",
+      organization: [],
       //分页的数据
-      currentPage4: 4
+      tableData: [],
+      pageSize: 5,
+      currentPage: 1,
+      total: 0,
     };
   },
+  created() {
+    this.getUser();
+  },
   methods: {
+    getUser() {
+      let params = {
+        currentPage: this.currentPage,
+        pageSize: this.pageSize,
+        keyWord: this.formInline.keyWord
+      };
+      getAllUserList(params).then((res) => {
+        console.log(111111111, res);
+        this.tableData = res.data.data.userList;
+        this.total = res.data.data.total;
+      });
+    },
     onSubmit() {
-      console.log('submit!');
+      this.currentPage = 1
+      this.getUser();
+    },
+    reset() {
+      this.formInline = {
+        account: "",
+      };
+      this.getUser()
     },
     //分页的事件
     handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
+      // console.log(`每页 ${val} 条`);
+      this.pageSize = val;
+      this.getUser();
     },
     handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
-    }
-  }
+      // console.log(`当前页: ${val}`);
+      this.currentPage = val;
+      this.getUser();
+    },
+  },
 };
 </script>
 <style lang="scss" scoped>
@@ -92,6 +122,9 @@ export default {
         width: 250px;
         display: flex;
         align-items: center;
+      }
+      /deep/ .el-form-item__content {
+        display: flex;
       }
       /deep/ .el-input__inner {
         width: 150px;
