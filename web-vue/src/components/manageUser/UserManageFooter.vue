@@ -1,48 +1,96 @@
 <template>
   <div class="user_manage_footer">
     <div class="button_group">
-      <el-button type="primary" @click="add" icon="el-icon-plus">添加用户</el-button>
-      <el-button type="primary" @click="deleteMoroUserList" icon="el-icon-minus">批量删除</el-button>
+      <el-button type="primary" @click="add" icon="el-icon-plus"
+        >添加用户</el-button
+      >
+      <el-button type="primary" @click="deleteMoroUserList" icon="el-icon-minus"
+        >批量删除</el-button
+      >
     </div>
-    <el-table ref="multipleTable" :data="tableData" tooltip-effect="dark" :header-cell-style="{ background: 'rgb(247,247,247)' }" style="width: 100%" height="608px" :cell-style="cellStyle" @selection-change="handleSelectionChange">
+    <el-table
+      ref="multipleTable"
+      :data="tableData"
+      tooltip-effect="dark"
+      :header-cell-style="{ background: 'rgb(247,247,247)' }"
+      style="width: 100%"
+      height="608px"
+      :cell-style="cellStyle"
+      @selection-change="handleSelectionChange"
+    >
       <el-table-column type="selection" width="55"></el-table-column>
       <el-table-column label="用户名">
         <template slot-scope="scope">{{ scope.row.account }}</template>
       </el-table-column>
-      <el-table-column prop="sex" label="性别" width="80" :formatter="formatSex"></el-table-column>
-      <el-table-column prop="admin" label="是否是管理员" :formatter="formatAdmin"></el-table-column>
+      <el-table-column
+        prop="sex"
+        label="性别"
+        width="80"
+        :formatter="formatSex"
+      ></el-table-column>
+      <el-table-column
+        prop="admin"
+        label="是否是管理员"
+        :formatter="formatAdmin"
+      ></el-table-column>
       <el-table-column label="操作" width="200">
         <template slot-scope="scope">
           <!-- <el-switch v-model="scope.row.isEffect" class="switchStyle" inactive-color="#ff4949" active-text="启用" inactive-text="禁用" active-value="1" inactive-value="0" @change="controlSwitch($event, scope.row.userId)"></el-switch> -->
           <!-- <i class="el-icon-view" @click="view(scope.row)"></i> -->
-          <i class="el-icon-edit" @click="edit(scope.row.account)"></i>
-          <i class="el-icon-delete" @click="deleteUser(scope.row.account)"></i>
+          <i class="el-icon-edit" @click="edit(scope.row.id)"></i>
+          <i class="el-icon-delete" @click="deleteUser(scope.row.id)"></i>
         </template>
       </el-table-column>
     </el-table>
-    <el-dialog :title="title" :visible.sync="dialogFormVisible" width="40%" :close-on-click-modal="false">
+    <el-dialog
+      :title="title"
+      :visible.sync="dialogFormVisible"
+      width="40%"
+      :close-on-click-modal="false"
+    >
       <el-form :model="form" :rules="rules" ref="ruleForm">
-        <el-form-item label="用户名" prop="userNumber" :label-width="formLabelWidth">
-          <el-input v-model="form.userNumber" autocomplete="off"></el-input>
+        <el-form-item
+          label="用户名"
+          prop="account"
+          :label-width="formLabelWidth"
+        >
+          <el-input v-model="form.account" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="密码" :label-width="formLabelWidth" prop="password">
-          <el-input type="password" v-model="form.password" autocomplete="off"></el-input>
+        <el-form-item
+          label="密码"
+          :label-width="formLabelWidth"
+          prop="password"
+        >
+          <el-input
+            type="password"
+            v-model="form.password"
+            autocomplete="off"
+          ></el-input>
         </el-form-item>
         <el-form-item label="性别" :label-width="formLabelWidth">
           <el-radio v-model="form.sex" label="1">男</el-radio>
           <el-radio v-model="form.sex" label="0">女</el-radio>
         </el-form-item>
+        <el-form-item label="用户级别" :label-width="formLabelWidth">
+          <el-radio v-model="form.admin" label="1">管理员</el-radio>
+          <el-radio v-model="form.admin" label="0">普通用户</el-radio>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="cancel()">取 消</el-button>
-        <el-button v-if="isModel" type="primary" @click="addUser('ruleForm')">确 定</el-button>
-        <el-button v-else type="primary" @click="editUser('ruleForm')">确 定</el-button>
+        <el-button v-if="isModel" type="primary" @click="addUser('ruleForm')"
+          >确 定</el-button
+        >
+        <el-button v-else type="primary" @click="editUser('ruleForm',)"
+          >确 定</el-button
+        >
       </div>
     </el-dialog>
   </div>
 </template>
 <script>
-import { getAllUserList } from "@/api/userManage";
+import { getAllUserList, addUser, deleteUser,updateUser } from "@/api/userManage";
+
 export default {
   props: {
     tableData: Array,
@@ -57,15 +105,11 @@ export default {
       dialogVisible: false,
       organization: [],
       form: {
-        userNumber: "",
+        id:"",
+        account: "",
         password: "",
-        username: "",
-        departmentNumber: "",
-        rolelist: [],
-        telephone: "",
-        email: "",
         sex: "1", //性别选择
-        newrolelist: [],
+        admin: "0", //是否为管理员，0为普通用户，1是管理员
       },
       // departmentNumber:"衡变本部",
       formLabelWidth: "120px",
@@ -73,17 +117,11 @@ export default {
       isModel: true,
       title: "添加用户",
       rules: {
-        userNumber: [
+        account: [
           { required: true, message: "请输用户名", trigger: "blur" },
           { pattern: /^[A-Za-z0-9]+$/, message: "只能输入字母和数字组合!" },
         ],
         password: [{ required: true, message: "请输入密码", trigger: "blur" }],
-        username: [
-          { required: true, message: "请输入员工姓名", trigger: "blur" },
-        ],
-        email: [
-          { type: "email", message: "请输入正确的邮箱地址", trigger: "blur" },
-        ],
       },
     };
   },
@@ -92,27 +130,21 @@ export default {
       return this.viewRow.sex == "1" ? "男" : "女";
     },
   },
-  created() {
-  },
-  mounted() { },
+  created() {},
+  mounted() {},
   methods: {
     addUser(formName) {
       this.$refs[formName].validate(async (valid) => {
         if (valid) {
           this.dialogFormVisible = false;
-          const selectRoleList = this.roleList.filter((item) => {
-            for (let i = 0; i < this.form.newrolelist.length; i++) {
-              if (item.roleNumber == this.form.newrolelist[i]) return true;
-            }
-            return false;
-          });
-          this.form.rolelist = selectRoleList;
-          // console.log("selectRoleList",selectRoleList);
-          console.log(2222, this.form);
-          await getUserAdd(this.form);
-          this.$message.success("添加用户成功!");
-          this.cancel();
-          location.reload();
+          const result = await addUser(this.form);
+          if (result.data.code == 200) {
+            this.$message.success("添加用户成功!");
+            this.cancel();
+            location.reload();
+          } else {
+            this.$message.error(result.data.msg);
+          }
         } else {
           return false;
         }
@@ -125,84 +157,76 @@ export default {
     },
     //查看用户
     view(row) {
-      this.dialogVisible = true
-      this.viewRow = row
-      this.roleArr = row.roleVOList
+      this.dialogVisible = true;
+      this.viewRow = row;
+      this.roleArr = row.roleVOList;
       console.log(this.viewRow);
     },
-    async edit(userNumber) {
+    async edit(id) {
       this.isModel = false;
       this.dialogFormVisible = true;
       this.title = "编辑用户";
-      const userDetail = await getUserDetail(userNumber);
-      console.log("role", userDetail.data);
-      const { roleVOList } = userDetail.data;
-      let showRolelist = [];
-      roleVOList.forEach((element) => {
-        showRolelist.push(element.roleNumber);
-      });
-      // console.log(2222,this.form.newrolelist);
-      this.form = userDetail.data;
-      console.log(this.form.newrolelist);
-      this.form.newrolelist = showRolelist;
-      // this.form.rolelist = this.form.newrolelist
-      console.log("form", this.form);
+      this.form.id=id;
     },
     editUser(formName) {
       this.$refs[formName].validate(async (valid) => {
         if (valid) {
           this.dialogFormVisible = false;
-          const selectUpdateRoleList = this.roleList.filter((item) => {
-            for (let i = 0; i < this.form.newrolelist.length; i++) {
-              if (item.roleNumber == this.form.newrolelist[i]) return true;
-            }
-            return false;
-          });
-          this.form.rolelist = selectUpdateRoleList;
-          console.log("qqq", this.form);
-          await getUserUpdate(this.form);
-          location.reload();
-          this.cancel();
+          const result=await updateUser(this.form);
+          if (result.data.code == 200) {
+            this.$message.success("修改用户成功!");
+            this.cancel();
+            location.reload();
+          } else {
+            this.$message.error(result.data.msg);
+          }
         } else {
           return false;
         }
       });
     },
-    async deleteUser(userNumber) {
-      const deleteRes = await deleteUser(userNumber);
-      if (deleteRes.status = 10000) {
+    async deleteUser(id) {
+      const ids = [];
+      ids.push(id);
+      const result = await deleteUser(ids);
+      if (result.data.code == 200) {
         this.$message.success("删除成功!");
+        this.cancel();
+        location.reload();
+      } else {
+        this.$message.error(result.data.msg);
       }
-      location.reload();
     },
     //批量删除
-    deleteMoroUserList() {
+    async deleteMoroUserList() {
+      const ids = [];
       this.multipleSelection.forEach((selectItem) => {
-        deleteUser(selectItem.userNumber).then(() => { });
-        location.reload();
+        ids.push(selectItem.id);
       });
+      const result = await deleteUser(ids);
+      if (result.data.code == 200) {
+        this.$message.success("删除成功");
+        this.cancel();
+        location.reload();
+      } else {
+        this.$message.error(result.data.msg);
+      }
     },
     cancel() {
       this.dialogFormVisible = false;
       // this.$refs[formName].resetFields();
       this.form = {
-        userNumber: "",
+        account: "",
         password: "",
-        username: "",
-        departmentNumber: "",
-        rolelist: [],
-        telephone: "",
-        email: "",
         sex: "1", //性别选择
-        newrolelist: [],
+        admin: "0", //是否为管理员，0为普通用户，1是管理员
       };
-      console.log(this.form);
     },
     formatSex(row) {
       return row.sex == "1" ? "男" : "女";
     },
     formatAdmin(row) {
-      return row.sex == "1" ? "管理员" : "普通用户";
+      return row.admin == "1" ? "管理员" : "普通用户";
     },
     //控制角色的颜色
     cellStyle({ columnIndex }) {

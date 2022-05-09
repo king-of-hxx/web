@@ -17,7 +17,7 @@ import java.util.Date;
 @TableName("ms_sys_user")
 public class User {
     @TableId(type = IdType.AUTO)
-    private Integer id;
+    private int id;
     private Integer admin;
     private String account;
     private String password;
