@@ -24,13 +24,13 @@
               <div> <img src="../../static/img/homeimg/u188.png" alt=""> </div>
               <span v-show="!isCollapse">首页</span>
             </li> -->
-            <li :style="isCollapse ? '' : open" @click="manageUser">
-              <div> <i class="el-icon-s-custom"></i> </div>
-              <span v-show="!isCollapse">用户信息</span>
-            </li>
             <li :style="isCollapse ? '' : open" @click="behaviorDetection">
               <div> <img src="../../static/img/homeimg/u190.png" alt=""> </div>
               <span v-show="!isCollapse">行为检测</span>
+            </li>
+            <li :style="isCollapse ? '' : open" v-if="user.admin == 1" @click="manageUser">
+              <div> <i class="el-icon-s-custom"></i> </div>
+              <span v-show="!isCollapse">用户信息</span>
             </li>
             <li :style="isCollapse ? '' : open" @click="densityDetection">
               <div> <img src="../../static/img/homeimg/u190.png" alt=""> </div>
@@ -77,8 +77,15 @@
           </div>
           <div class="icon" style="display:flex;align-items: center">
             <i class="el-icon-bell"></i>
-            <i class="el-icon-right"></i>
+            <i class="el-icon-right" @click="isSureModel = true"></i>
           </div>
+          <el-dialog title="提示" :visible.sync="isSureModel" width="30%" :close-on-click-modal="false">
+            <span>是否确认退出登录当前用户?</span>
+            <span slot="footer" class="dialog-footer">
+              <el-button @click="isSureModel = false">取消</el-button>
+              <el-button type="primary" @click="loginOutSure">确定</el-button>
+            </span>
+          </el-dialog>
         </el-header>
         <keep-alive>
           <router-view class="content"></router-view>
@@ -89,6 +96,7 @@
 </template>
 <script>
 import ContentBody from '@/components/contentBody/ContentBody.vue'
+import { logout } from '@/utils/util'
 export default {
   components: {
     ContentBody,
@@ -96,9 +104,11 @@ export default {
   // name:["Pproduction"],
   data() {
     return {
+      user: {},
       //需要被 keep-alive
       // cacheRoute:["Pproduction"],
       isCollapse: true,
+      isSureModel: false,
       open: {
         width: "35%",
         height: "120px"
@@ -111,7 +121,15 @@ export default {
       }
     };
   },
+  mounted() {
+    this.user = JSON.parse(localStorage.getItem("user"))
+  },
   methods: {
+    //退出登录
+    loginOutSure() {
+      logout();
+      // location.reload()
+    },
     handleOpen(key, keyPath) {
       console.log(key, keyPath);
     },
@@ -242,7 +260,11 @@ export default {
   align-items: center;
   justify-content: space-around;
 }
-
+.menu-item-group::after {
+  content: "";
+  height: 0;
+  width: 35%;
+}
 li span {
   color: black;
   font-size: 20px;
@@ -267,14 +289,11 @@ li div img {
   width: 60px;
   height: 60px;
 }
-.el-button {
-  padding: 0px !important;
-}
 .el-menu-vertical-demo:not(.el-menu--collapse) {
   width: 300px;
   min-height: 400px;
   text-align: center;
-  height: 100vh;
+  /* height: 100vh; */
 }
 .btn-display {
   display: none;
@@ -298,7 +317,7 @@ li div img {
 }
 .content {
   padding: 10px;
-  background-color: rgb(236, 245, 255);
+  /* background-color: rgb(236, 245, 255); */
 }
 .el-container {
   background-color: #e6f1fc;

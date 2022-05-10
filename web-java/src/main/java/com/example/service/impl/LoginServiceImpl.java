@@ -22,7 +22,6 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public Result login(LoginParams loginParams) {
-        System.out.println(loginParams);
         String account = loginParams.getAccount();
         String password = loginParams.getPassword();
         if(StringUtils.isBlank(account) || StringUtils.isBlank(password)){
@@ -32,13 +31,13 @@ public class LoginServiceImpl implements LoginService {
         LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(User::getAccount,account);
         lambdaQueryWrapper.eq(User::getPassword,password);
-        lambdaQueryWrapper.select(User::getId,User::getAccount);
+        lambdaQueryWrapper.select(User::getId,User::getAccount,User::getAdmin);
         lambdaQueryWrapper.last("limit " + 1);
         User loginUserInfo = loginMapper.selectOne(lambdaQueryWrapper);
         System.out.println(loginUserInfo);
         if(loginUserInfo == null){
             return Result.fail(ErrorCode.ACCOUNT_PWD_NOT_EXIST.getCode(),ErrorCode.ACCOUNT_PWD_NOT_EXIST.getMsg());
         }
-        return Result.success(null);
+        return Result.success(loginUserInfo);
     }
 }

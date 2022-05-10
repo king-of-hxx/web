@@ -1,4 +1,5 @@
 import axios from "axios";
+import Vue from "vue";
 import { openLoading, closeLoading } from "./loading";
 
 const instance = axios.create({
@@ -26,13 +27,14 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
   (response) => {
     closeLoading();
-    // const { code, message } = response.data;
-    // if (code === 200) {
-    return response;
-    // } else {
-    //   Message.error(message);
-    //   // return Promise.reject(new Error(message));
-    // }
+    const { code, msg } = response.data;
+    if (code == 200) {
+      return response;
+    } else {
+      Vue.prototype.$message.error(msg);
+      return response;
+      // return Promise.reject(new Error(msg));
+    }
   },
   (err) => {
     closeLoading();

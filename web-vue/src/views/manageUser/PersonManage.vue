@@ -39,7 +39,7 @@ export default {
 <style lang="scss" scoped>
 .manage_user_box {
   width: 100%;
-  // border: 1px solid red;
+  height: 90vh;
   box-sizing: border-box;
   background-color: rgb(236, 245, 255);
   display: flex;

@@ -40,7 +40,7 @@ import { setToken } from "@/utils/auth"
 import cookie from 'js-cookie'
 
 export default {
-  name: 'login',
+  name: 'Login',
   data() {
     return {
       msg: '',
@@ -59,7 +59,6 @@ export default {
   },
   methods: {
     async login() {
-      console.log(this.loginData);
       if (this.loginData.account.trim() === "") {
         this.$message.warning("请输入用户名！");
       } else if (this.loginData.password.trim() === "") {
@@ -67,8 +66,8 @@ export default {
       } else {
         //登录接口
         const res = await Login(this.loginData)
-        console.log(res);
         if (res.data.code == 200) {
+          localStorage.setItem("user", JSON.stringify(res.data.data))
           this.$message.success("登陆成功");
           this.$router.push(`/home`);
         }

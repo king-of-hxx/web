@@ -4,7 +4,7 @@
       <h3>用户管理</h3>
     </CommonHeader>
     <section>
-      <el-form :model="formInline" class="demo-form-inline">
+      <el-form :model="formInline" class="demo-form-inline" @submit.native.prevent>
         <el-form-item label="用户名">
           <el-input v-model="formInline.keyWord" @keyup.enter.native="onSubmit" placeholder="请输入用户名"></el-input>
         </el-form-item>
@@ -23,7 +23,7 @@
       </el-form>
     </section>
     <footer>
-      <UserManageFooter :tableData="tableData" />
+      <UserManageFooter :tableData="tableData" @getUser="getUser" />
       <el-row type="flex" justify="end">
         <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="[5, 10, 15, 20]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
         </el-pagination>
@@ -65,13 +65,12 @@ export default {
         keyWord: this.formInline.keyWord
       };
       getAllUserList(params).then((res) => {
-        console.log(111111111, res);
         this.tableData = res.data.data.userList;
         this.total = res.data.data.total;
       });
     },
     onSubmit() {
-      this.currentPage = 1
+      // this.currentPage = 1
       this.getUser();
     },
     reset() {

@@ -52,12 +52,12 @@ const routes = [
         ],
       },
       {
-        path: "panicDetection",
+        path: "densityDdetection",
         name: "densityDetection",
         component: () => import("@/components/densityDdetection"),
       },
       {
-        path: "behaviorDetection",
+        path: "",
         name: "behaviorDetection",
         component: () => import("@/components/behaviorDetection"),
       },
