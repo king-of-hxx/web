@@ -88,12 +88,21 @@ public class UserServiceImpl implements IUserSevice {
     //更新用户
     @Override
     public Result updateUser(User user) throws Exception {
-        user.setPassword(DigestUtils.md5Hex(user.getPassword()));
-        boolean result=userMapper.updateUser(user);
+        User user1 = userMapper.selectById(user.getId());
+        if (!user1.getPassword().equals(user.getPassword())){
+            user.setPassword(DigestUtils.md5Hex(user.getPassword()));
+        }
+//        boolean result=userMapper.updateUser(user);
+        Boolean result = userMapper.updateUser(user);
         if(result){
             return Result.success(user);
         }else{
             return Result.fail(1, "更新失败");
         }
+    }
+
+    @Override
+    public Result editUser(Long id) {
+        return Result.success(userMapper.selectById(id));
     }
 }

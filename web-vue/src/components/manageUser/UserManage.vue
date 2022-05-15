@@ -70,7 +70,7 @@ export default {
       });
     },
     onSubmit() {
-      // this.currentPage = 1
+      this.currentPage = 1
       this.getUser();
     },
     reset() {

@@ -20,7 +20,7 @@
         <span>人群恐慌程度估计值:0.31</span>
       </div>
       <div>
-        <el-upload class="avatar-uploader" action="http://localhost" v-bind:on-progress="uploadVideoProcess" v-bind:on-success="handleVideoSuccess" v-bind:before-upload="beforeUploadVideo" v-bind:show-file-list="false">
+        <el-upload class="avatar-uploader" ref="uploadButton" action="#" :auto-upload="false" :http-request="uploadFile" :on-change="submitFile" v-bind:on-progress="uploadVideoProcess" v-bind:before-upload="beforeUploadVideo" v-bind:show-file-list="false">
           <video v-if="videoForm.showVideoPath != '' && !videoFlag" v-bind:src="videoForm.showVideoPath" class="avatar video-avatar" preload="auto" autoplay="autoplay" loop="loop" controls="controls">
             您的浏览器不支持视频播放
           </video>
@@ -28,15 +28,17 @@
           <el-progress v-if="videoFlag == true" type="circle" v-bind:percentage="videoUploadPercent" style="margin-top: 7px"></el-progress>
         </el-upload>
       </div>
-      <el-button type="primary">开始检测</el-button>
+      <el-button type="primary" @click="sure">开始检测</el-button>
     </div>
   </div>
 </template>
 <script>
+import { upload } from "@/api/assemble"
 export default {
   name: "densityDetection",
   data() {
     return {
+      file: "",
       videoFlag: false,
       //是否显示进度条
       videoUploadPercent: "",
@@ -55,7 +57,53 @@ export default {
   created() { },
   mounted() {
   },
-  methods: {}
+  methods: {
+    submitFile(file, fileList) {
+      // 获取上传的文件
+      this.file = file.raw
+      // 通过submit调用uploadFile
+      // this.$refs.uploadButton.submit()
+    },
+    async uploadFile() {
+      console.log(this.file);
+      let formdata = new FormData();
+      formdata.append("file", this.file)
+      const res = await upload(formdata)
+      console.log(res);
+    },
+    sure() {
+      this.$refs.uploadButton.submit()
+    },
+    //上传前回调
+    beforeUploadVideo(file) {
+      var fileSize = file.size / 1024 / 1024 < 50;   //控制大小  修改50的值即可
+      if (
+        [
+          "video/mp4",
+          "video/ogg",
+          "video/flv",
+          "video/avi",
+          "video/wmv",
+          "video/rmvb",
+          "video/mov",
+        ].indexOf(file.type) == -1     //控制格式
+      ) {
+        this.$message.error("请上传正确的视频格式");
+        return false;
+      }
+      if (!fileSize) {
+        this.$message.error("视频大小不能超过50MB");
+        return false;
+      }
+      this.isShowUploadVideo = false;
+    },
+    //进度条
+    uploadVideoProcess(event, file, fileList) {    //注意在data中添加对应的变量名
+      console.log(file);
+      this.videoFlag = true;
+      this.videoUploadPercent = file.percentage.toFixed(0) * 1;
+    },
+  }
 }
 </script>
 <style scoped lang="less">

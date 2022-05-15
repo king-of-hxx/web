@@ -14,8 +14,8 @@
             <img src="../../static/assets/suanfa.jpg" alt="" style="width: 10vw;height: 20vh;" />
           </i>
           <div v-if="isCollapse == false" style="display:flex;flex-direction: column;margin-bottom:20px;font-size:17px">
-            <span>管理员</span>
-            <span>阿龙</span>
+            <span>{{user.admin == 1 ? '管理员':'普通用户'}}</span>
+            <span>{{user.account}}</span>
           </div>
         </div>
         <div>

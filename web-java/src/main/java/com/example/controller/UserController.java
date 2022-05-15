@@ -41,4 +41,8 @@ public class UserController {
     public Result updateUser(@RequestBody User user) throws Exception {
         return userService.updateUser(user);
     }
+    @GetMapping("/edit")
+    public Result edit(@RequestParam Long id){
+        return userService.editUser(id);
+    }
 }

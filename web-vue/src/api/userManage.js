@@ -31,3 +31,12 @@ export function updateUser(data) {
     data: data,
   });
 }
+export function editUser(id) {
+  return request({
+    url: "/edit",
+    method: "get",
+    params: {
+      id,
+    },
+  });
+}

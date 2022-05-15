@@ -20,4 +20,6 @@ public interface IUserSevice {
     Result deleteUser(List ids);
 
     Result updateUser(User user)throws Exception;
+
+    Result editUser(Long id);
 }

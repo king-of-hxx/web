@@ -20,7 +20,7 @@
         <span>人群恐慌程度估计值:0.31</span>
       </div>
       <div>
-        <el-upload class="avatar-uploader" action="http://localhost" v-bind:on-progress="uploadVideoProcess" v-bind:on-success="handleVideoSuccess" v-bind:before-upload="beforeUploadVideo" v-bind:show-file-list="false">
+        <el-upload class="avatar-uploader" ref="uploadButton" action="#" :auto-upload="false" :http-request="uploadFile" :on-change="submitFile" v-bind:on-progress="uploadVideoProcess" v-bind:before-upload="beforeUploadVideo" v-bind:show-file-list="false">
           <video v-if="videoForm.showVideoPath != '' && !videoFlag" v-bind:src="videoForm.showVideoPath" class="avatar video-avatar" preload="auto" autoplay="autoplay" loop="loop" controls="controls">
             您的浏览器不支持视频播放
           </video>
@@ -33,9 +33,11 @@
   </div>
 </template>
 <script>
+import { upload } from "@/api/assemble"
 export default {
   data() {
     return {
+      file: "",
       videoFlag: false,
       //是否显示进度条
       videoUploadPercent: "",
@@ -55,6 +57,22 @@ export default {
   mounted() {
   },
   methods: {
+    submitFile(file, fileList) {
+      // 获取上传的文件
+      this.file = file.raw
+      // 通过submit调用uploadFile
+      // this.$refs.uploadButton.submit()
+    },
+    async uploadFile() {
+      console.log(this.file);
+      let formdata = new FormData();
+      formdata.append("file", this.file)
+      const res = await upload(formdata)
+      console.log(res);
+    },
+    sure() {
+      this.$refs.uploadButton.submit()
+    },
     //上传前回调
     beforeUploadVideo(file) {
       var fileSize = file.size / 1024 / 1024 < 50;   //控制大小  修改50的值即可
@@ -83,20 +101,6 @@ export default {
       console.log(file);
       this.videoFlag = true;
       this.videoUploadPercent = file.percentage.toFixed(0) * 1;
-    },
-    //上传成功回调
-    handleVideoSuccess(res, file) {
-      this.isShowUploadVideo = true;
-      this.videoFlag = false;
-      this.videoUploadPercent = 0;
-
-      console.log(1111, res);
-      //后台上传数据
-      if (res.success == true) {
-        this.videoForm.showVideoPath = res.data.url;    //上传成功后端返回视频地址 回显
-      } else {
-        this.$message.error("上传失败！");
-      }
     },
   }
 }

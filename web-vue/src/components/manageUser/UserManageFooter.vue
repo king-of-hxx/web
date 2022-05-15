@@ -38,7 +38,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="cancel()">取 消</el-button>
+        <el-button @click="cancel">取 消</el-button>
         <el-button v-if="isModel" type="primary" @click="addUser('ruleForm')">确 定</el-button>
         <el-button v-else type="primary" @click="editUser('ruleForm',)">确 定</el-button>
       </div>
@@ -46,7 +46,7 @@
   </div>
 </template>
 <script>
-import { getAllUserList, addUser, deleteUser, updateUser } from "@/api/userManage";
+import { editUser, addUser, deleteUser, updateUser } from "@/api/userManage";
 
 export default {
   props: {
@@ -62,7 +62,14 @@ export default {
       dialogVisible: false,
       organization: [],
       form: {
-        id: "",
+        id: '',
+        account: "",
+        password: "",
+        sex: "1", //性别选择
+        admin: "0", //是否为管理员，0为普通用户，1是管理员
+      },
+      oldForm: {
+        id: '',
         account: "",
         password: "",
         sex: "1", //性别选择
@@ -119,12 +126,19 @@ export default {
       console.log(this.viewRow);
     },
     async edit(row) {
+      console.log(row);
+      let obj = Object.assign({}, row)
       this.isModel = false;
       this.dialogFormVisible = true;
       this.title = "编辑用户";
-      this.form = row;
-      this.form.sex = row.sex.toString()
-      this.form.admin = row.sex.toString()
+      this.form = obj;
+      this.form.sex = row.sex.toString();
+      this.form.admin = row.admin.toString();
+      this.oldForm = this.form;
+      // const userinfo = await editUser(row.id)
+      // console.log(userinfo);
+      // this.form = userinfo.data.data
+      console.log(this.form);
     },
     editUser(formName) {
       this.$refs[formName].validate(async (valid) => {
